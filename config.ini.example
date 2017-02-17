@@ -1,0 +1,23 @@
+[tg_bot]
+token = 123456789:YOLOFUBAR
+
+[webserver]
+#the url prefix for downloaded files
+url = http://telegram.com:81/tg/
+
+#path where the bot stores downloaded files
+directory = /var/www/localhost/htdocs/tg/
+
+#data retention in minutes, 0 for unlimited
+data_retention = 120
+
+[webhook]
+url = https://whatever.here.not.there
+ssl_cert = ssl/cert.pem
+ssl_key = ssl/private.key
+listen_ip = 0.0.0.0
+port = 8443
+
+[irc]
+nickserv_password = THIS_IS_SUPER_SECRET_NOBODY_SHOULD_KNOW
+nickname = NICKNAME
