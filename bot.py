@@ -32,7 +32,7 @@ if __name__ == "__main__":
     dbc.create_tables()
     # irc_server = IRCServer('Freenode', 'chat.freenode.net')
     # dbc.add_irc_server(irc_server)
-    #
+
     # irc_server = IRCServer('Quakenet', 'irc.quakenet.org', port=6667, ssl=False)
     # dbc.add_irc_server(irc_server)
     # irc_server = IRCServer('IRCNet', 'open.ircnet.org', port=6666)

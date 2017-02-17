@@ -178,9 +178,9 @@ class TGBot():
             return ConversationHandler.END
 
         servers = DatabaseConnection().get_all_irc_server_descriptions()
-        update.message.reply_text('Hi! I\'m BridgeBot. If you can, you should host your own BridgeBot. This way you can' +
-            ' change the config for e.g. preventing files from being deleted. You can get the code on github: https://github.com/PostalBlab/VectronBot. ' +
-            'If you want to use this Bot, i need some informations. You can cancel this dialogue with /cancel' +
+        update.message.reply_text('Hi! I\'m BridgeBot. If you can, you should host your own BridgeBot. This way you can ' +
+            'change the config for e.g. preventing files from being deleted. You can get the code on github: https://github.com/PostalBlab/VectronBot. ' +
+            'If you want to use this Bot, i need some informations. You can cancel this dialogue with /cancel ' +
             'Here is a list of all public supported irc servers. Please tell me which one you want to use. '
             'If your prefered server is not in the list you can contact the maintainer @PostalDude. He can also add hidden servers where only you know '
             'the needed description:\n' +
@@ -235,7 +235,7 @@ class TGBot():
             primary_tg_id = dbc.get_primary_group_id_by_irc_data(user_data['channel'], user_data['irc_server_description'])
             secondary_bridge = Bridge.SecondaryBridge(user_data['tg_group_id'], False, user_data['token'], self.bridges[primary_tg_id])
             dbc.add_secondary_bridge(secondary_bridge)
-            update.message.reply_text('To validate this secondary bridge, someone with +o has to paste this code into the channel: %s' % user_data['token'])
+            update.message.reply_text('To validate this secondary bridge, someone with +o has to paste this code into the channel: !token %s' % user_data['token'])
             return ConversationHandler.END
 
         elif update.message.text == 'no':
@@ -254,7 +254,7 @@ class TGBot():
                 Ok. I am going to connect to the server...
             ''')
             if self.create_bridge_from_userdata(user_data):
-                update.message.reply_text('I\'m connected to the server and joined the channel. Someone with +o has to paste this code into the channel: %s' % user_data['token'])
+                update.message.reply_text('I\'m connected to the server and joined the channel. Someone with +o has to paste this code into the channel: !token %s' % user_data['token'])
                 return ConversationHandler.END
             else:
                 update.message.reply_text('Something went wrong. Please contact nobody! ABORT')
