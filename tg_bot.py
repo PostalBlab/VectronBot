@@ -242,8 +242,8 @@ class TGBot():
             update.message.reply_text('No? Ok... Abort!')
             return ConversationHandler.END
         else:
-            update.message.reply_text('Error. This code should be unreachable')
-            return ConversationHandler.END
+            update.message.reply_text('Can\'t understand you.')
+            return ConversationHandler.CREATE_SECONDARY_BRIDGE
         return ConversationHandler.END
 
     def connect_channel(self, bot, update, user_data):
@@ -264,8 +264,8 @@ class TGBot():
             update.message.reply_text('No? Ok...')
             return ConversationHandler.END
         else:
-            update.message.reply_text('Error. This code should be unreachable')
-            return ConversationHandler.END
+            update.message.reply_text('Can\'t understand you.')
+            return ConversationHandler.CONNECT_CHANNEL
 
     def debug(self, bot, update):
         user_data = {}
