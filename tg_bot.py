@@ -45,8 +45,9 @@ class TGBot():
         self.dispatcher = self.updater.dispatcher
         help_handler = ConversationHandler(
                 entry_points=[CommandHandler('help', self.help)],
-                states=None,
-                fallbacks=None
+                states={},
+                fallbacks=[]
+
         )
 
         conv_handler = ConversationHandler(
