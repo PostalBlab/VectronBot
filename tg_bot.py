@@ -335,10 +335,22 @@ class TGBot():
                 return True
         return False
 
+    def format_username(self, first_name, last_name):
+        return '{first_name}{last_name}'.format(
+                first_name=first_name,
+                last_name=' {last_name}'.format(last_name=last_name) if last_name is not None else ''
+            )
+
     def message_received(self, bot, update):
         try:
             bridge = self.get_bridge_by_id(update.message.chat_id)
-            bridge.tg_message(update.message.from_user.first_name + ' ' + update.message.from_user.last_name, update.message.text)
+            bridge.tg_message(
+                self.format_username(
+                    update.message.from_user.first_name,
+                    update.message.from_user.last_name
+                    ), 
+                update.message.text
+            )
         except KeyError as e:
             logging.debug('KeyError in tg_bot. Unknown group')
         except Exception as e:
@@ -355,7 +367,10 @@ class TGBot():
                     biggest = photo
             file_location = self.download_file(biggest.file_id, update.message.chat_id)
             bridge.tg_message(
-                update.message.from_user.first_name + (' ' + update.message.from_user.last_name if update.message.from_user.last_name else ''),
+                self.format_username(
+                    update.message.from_user.first_name,
+                    update.message.from_user.last_name
+                    ),
                 self.DL_URL + file_location + ' ' + update.message.caption
             )
 
@@ -366,7 +381,10 @@ class TGBot():
         try:
             bridge = self.get_bridge_by_id(update.message.chat_id)
             file_location = self.download_file(update.message.voice.file_id, update.message.chat_id)
-            bridge.tg_message(update.message.from_user.first_name + ' ' + update.message.from_user.last_name, self.DL_URL + file_location)
+            bridge.tg_message(self.format_username(
+                    update.message.from_user.first_name,
+                    update.message.from_user.last_name
+                    ), self.DL_URL + file_location)
 
         except Exception as e:
             logging.debug('voice_received: ' + e)
@@ -375,7 +393,10 @@ class TGBot():
         try:
             bridge = self.get_bridge_by_id(update.message.chat_id)
             file_location = self.download_file(update.message.document.file_id, update.message.chat_id)
-            bridge.tg_message(update.message.from_user.first_name + ' ' + update.message.from_user.last_name, self.DL_URL + file_location)
+            bridge.tg_message(self.format_username(
+                    update.message.from_user.first_name,
+                    update.message.from_user.last_name
+                    ), self.DL_URL + file_location)
 
         except Exception as e:
             logging.debug('document_received: ' + e)
@@ -384,7 +405,10 @@ class TGBot():
         try:
             bridge = self.get_bridge_by_id(update.message.chat_id)
             file_location = self.download_file(update.message.sticker.file_id, update.message.chat_id)
-            bridge.tg_message(update.message.from_user.first_name + ' ' + update.message.from_user.last_name, self.DL_URL + file_location)
+            bridge.tg_message(self.format_username(
+                    update.message.from_user.first_name,
+                    update.message.from_user.last_name
+                    ), self.DL_URL + file_location)
 
         except Exception as e:
             logging.debug('sticker_received: ' + e)
@@ -393,7 +417,10 @@ class TGBot():
         try:
             bridge = self.get_bridge_by_id(update.message.chat_id)
             file_location = self.download_file(update.message.video.file_id, update.message.chat_id)
-            bridge.tg_message(update.message.from_user.first_name + ' ' + update.message.from_user.last_name, self.DL_URL + file_location)
+            bridge.tg_message(self.format_username(
+                    update.message.from_user.first_name,
+                    update.message.from_user.last_name
+                    ), self.DL_URL + file_location)
 
         except Exception as e:
             logging.debug('video_received: ' + e)
@@ -402,7 +429,10 @@ class TGBot():
         try:
             bridge = self.get_bridge_by_id(update.message.chat_id)
             file_location = self.download_file(update.message.audio.file_id, update.message.chat_id)
-            bridge.tg_message(update.message.from_user.first_name + ' ' + update.message.from_user.last_name, self.DL_URL + file_location)
+            bridge.tg_message(self.format_username(
+                    update.message.from_user.first_name,
+                    update.message.from_user.last_name
+                    ), self.DL_URL + file_location)
 
         except Exception as e:
             logging.debug('audio_received: ' + e)
