@@ -244,7 +244,7 @@ class TGBot():
             return ConversationHandler.END
         else:
             update.message.reply_text('Can\'t understand you.')
-            return ConversationHandler.CREATE_SECONDARY_BRIDGE
+            return self.CREATE_SECONDARY_BRIDGE
         return ConversationHandler.END
 
     def connect_channel(self, bot, update, user_data):
@@ -266,7 +266,7 @@ class TGBot():
             return ConversationHandler.END
         else:
             update.message.reply_text('Can\'t understand you.')
-            return ConversationHandler.CONNECT_CHANNEL
+            return self.CONNECT_CHANNEL
 
     def debug(self, bot, update):
         user_data = {}
