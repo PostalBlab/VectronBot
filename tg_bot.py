@@ -382,10 +382,14 @@ class TGBot():
         try:
             bridge = self.get_bridge_by_id(update.message.chat_id)
             file_location = self.download_file(update.message.voice.file_id, update.message.chat_id)
+            message = self.DL_URL + file_location + ((' ' + update.message.caption) if update.message.caption is not None else '')
+
             bridge.tg_message(self.format_username(
                     update.message.from_user.first_name,
                     update.message.from_user.last_name
-                    ), self.DL_URL + file_location)
+                    ), 
+                    message
+                )
 
         except Exception as e:
             logging.debug('voice_received: ' + e)
@@ -394,10 +398,13 @@ class TGBot():
         try:
             bridge = self.get_bridge_by_id(update.message.chat_id)
             file_location = self.download_file(update.message.document.file_id, update.message.chat_id)
+            message = self.DL_URL + file_location + ((' ' + update.message.caption) if update.message.caption is not None else '')
             bridge.tg_message(self.format_username(
                     update.message.from_user.first_name,
                     update.message.from_user.last_name
-                    ), self.DL_URL + file_location)
+                    ), 
+                    message
+                )
 
         except Exception as e:
             logging.debug('document_received: ' + e)
@@ -418,10 +425,12 @@ class TGBot():
         try:
             bridge = self.get_bridge_by_id(update.message.chat_id)
             file_location = self.download_file(update.message.video.file_id, update.message.chat_id)
+            message = self.DL_URL + file_location + ((' ' + update.message.caption) if update.message.caption is not None else '')
             bridge.tg_message(self.format_username(
                     update.message.from_user.first_name,
                     update.message.from_user.last_name
-                    ), self.DL_URL + file_location)
+                    ), message
+                )
 
         except Exception as e:
             logging.debug('video_received: ' + e)
