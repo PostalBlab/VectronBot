@@ -366,12 +366,13 @@ class TGBot():
                 if photo.file_size > biggest.file_size:
                     biggest = photo
             file_location = self.download_file(biggest.file_id, update.message.chat_id)
+            message = self.DL_URL + file_location + ((' ' + update.message.caption) if update.message.caption is not None else '')
             bridge.tg_message(
                 self.format_username(
                     update.message.from_user.first_name,
                     update.message.from_user.last_name
                     ),
-                self.DL_URL + file_location + ' ' + update.message.caption
+                message
             )
 
         except Exception as e:
