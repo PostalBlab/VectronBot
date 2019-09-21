@@ -46,18 +46,7 @@ class IRCConnections:
                     'irc3.plugins.command',
                     'irc3.plugins.userlist',
                     'vectronbot_irc_plugin',
-                ],
-                username=(
-                        'Telegram IRC bridge based on irc3 http://irc3.readthedocs.io '
-                        'and https://github.com/python-telegram-bot/python-telegram-bot'
-                    ),
-                url='https://localhost/',
-                ctcp=dict(
-                        version='TGIRC 0.1',
-                        userinfo='{realname}',
-                        time='{now:%c}',
-                    )
-                )
+                ])
 
             self._bot = irc3.IrcBot(**config)
             self._bot.set_t_callback(self.t_callback)
