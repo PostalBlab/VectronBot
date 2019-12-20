@@ -49,7 +49,8 @@ class Bridge():
 
     def send_to_irc(self, user, message):
         if self.validated:
-            self.irc_channel.send_message('<{}> {}'.format(user, message))
+            for split_message in [message[i:i+400] for i in range(0, len(message), 400)]:
+                self.irc_channel.send_message('<{}> {}'.format(user, split_message))
 
     def send_to_tg(self, user, message):
          if self.validated:
