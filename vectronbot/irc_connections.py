@@ -18,14 +18,13 @@
 
 import logging
 import irc3
-#import vectronbot_irc_plugin
 import threading
-from database import DatabaseConnection
 import irc3.config
-from config import config as vectron_config
+from vectronbot.database import DatabaseConnection
+from vectronbot.config import config as vectron_config
+
 
 class IRCConnections:
-
     class IRCConnection(threading.Thread):
         def __init__(self, irc_server):
             self.irc_server = irc_server
@@ -39,14 +38,14 @@ class IRCConnections:
                 host=irc_server.host,
                 port=irc_server.port,
                 ssl=irc_server.ssl,
-                async=False,
-                ssl_verify='CERT_NONE',
-                includes=[
-                    'irc3.plugins.core',
-                    'irc3.plugins.command',
-                    'irc3.plugins.userlist',
-                    'vectronbot_irc_plugin',
-                ])
+            async=False,
+                  ssl_verify = 'CERT_NONE',
+                               includes = [
+                'irc3.plugins.core',
+                'irc3.plugins.command',
+                'irc3.plugins.userlist',
+                'vectronbot_irc_plugin',
+            ])
 
             self._bot = irc3.IrcBot(**config)
             self._bot.set_t_callback(self.t_callback)
@@ -98,9 +97,10 @@ class IRCConnections:
             self.rejoin_all_channel()
 
         def rejoin_all_channel(self):
-            #try to join all previous channels
+            # try to join all previous channels
             for key, channel in self.irc_server.channels.items():
                 self._bot.join_channel_threadsafe(channel.channel)
+
     def __init__(self):
         self.connections = {}
 

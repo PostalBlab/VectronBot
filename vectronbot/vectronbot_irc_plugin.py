@@ -16,16 +16,16 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-from irc3.plugins.command import command
 import irc3
 import irc3d
 import threading
 import logging
-from config import config
+from irc3.plugins.command import command
+from vectronbot.config import config
+
 
 @irc3.plugin
 class VectronBotIRCPlugin:
-
     requires = [
         'irc3.plugins.core',
         'irc3.plugins.command'

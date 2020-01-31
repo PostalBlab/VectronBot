@@ -18,14 +18,14 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 import logging
-from tg_bot import TGBot
-from database import DatabaseConnection
-from filehandler import CronDelete
-from config import config
-from irc_server import IRCServer
+from vectronbot.tg_bot import TGBot
+from vectronbot.database import DatabaseConnection
+from vectronbot.filehandler import CronDelete
+from vectronbot.config import config
+from vectronbot.irc_server import IRCServer
 
-if __name__ == "__main__":
 
+def start_tg_bot():
     tg_bot = TGBot()
 
     dbc = DatabaseConnection()
@@ -51,9 +51,13 @@ if __name__ == "__main__":
             only_add_channel=True
         )
 
-    #delete old files if the data retention is > 0
+    # delete old files if the data retention is > 0
     if config.webserver_data_retention > 0:
         cron_delete = CronDelete()
         cron_delete.start()
 
     tg_bot.start_webhook()
+
+
+if __name__ == "__main__":
+    start_tg_bot()

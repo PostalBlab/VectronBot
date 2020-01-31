@@ -20,6 +20,7 @@ import configparser
 import os.path
 import logging
 
+
 class Config:
 
     def __init__(self):
@@ -43,4 +44,6 @@ class Config:
 
         self.nickserv_password = ini_config['irc']['nickserv_password']
         self.irc_bot_nickname = ini_config['irc']['nickname']
+
+
 config = Config()

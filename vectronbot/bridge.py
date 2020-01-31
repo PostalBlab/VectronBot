@@ -17,10 +17,10 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 import logging
-import database
+import vectronbot.database
+
 
 class Bridge():
-
     class SecondaryBridge():
         def __init__(self, tg_group_id, validated, token, bridge):
             self.bridge = bridge
@@ -40,7 +40,6 @@ class Bridge():
         dbc = database.DatabaseConnection()
         dbc.get_all_secondary_bridges(self)
 
-
     def add_secondary_bridge(self, secondary_bridge):
         self.secondary_bridges[secondary_bridge.tg_group_id] = secondary_bridge
 
@@ -49,12 +48,12 @@ class Bridge():
 
     def send_to_irc(self, user, message):
         if self.validated:
-            for split_message in [message[i:i+400] for i in range(0, len(message), 400)]:
+            for split_message in [message[i:i + 400] for i in range(0, len(message), 400)]:
                 self.irc_channel.send_message('<{}> {}'.format(user, split_message))
 
     def send_to_tg(self, user, message):
-         if self.validated:
-             self.tg_bot.send_message(self.tg_group_id, '<{}> {}'.format(user, message))
+        if self.validated:
+            self.tg_bot.send_message(self.tg_group_id, '<{}> {}'.format(user, message))
 
     def irc_token_received(self, from_user, token):
         if self.validated:
