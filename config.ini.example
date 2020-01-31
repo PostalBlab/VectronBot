@@ -12,7 +12,7 @@ directory = /var/www/localhost/htdocs/tg/
 data_retention = 120
 
 [webhook]
-url = https://whatever.here.not.there
+url = https://whatever.example.com
 ssl_cert = ssl/cert.pem
 ssl_key = ssl/private.key
 listen_ip = 0.0.0.0

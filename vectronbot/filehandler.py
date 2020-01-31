@@ -14,23 +14,22 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-import urllib, urllib.request
-import hashlib
-import os
-from PIL import Image
-import random
-import string
-from config import config
-from os import listdir
-import os
-from os.path import isfile, join, isdir
 import time
 import logging
 import threading
+import urllib, urllib.request
+import hashlib
+import os
+import random
+import string
+from PIL import Image
+from config import config
+from os import listdir
+from os.path import isfile, join, isdir
+
 
 class FileHandler:
-
-    DOWNLOAD_PATH=config.webserver_directory
+    DOWNLOAD_PATH = config.webserver_directory
 
     def download(url, tg_group_id):
         group_path = hashlib.md5(str(tg_group_id).encode('UTF-8')).hexdigest()
@@ -42,10 +41,11 @@ class FileHandler:
 
         full_path = group_path + '/' + file_name + file_extension
 
-        urllib.request.urlretrieve (url, FileHandler.DOWNLOAD_PATH + full_path)
+        urllib.request.urlretrieve(url, FileHandler.DOWNLOAD_PATH + full_path)
 
-        if(os.path.splitext(url)[1] == '.webp'):
-            FileHandler.convert_webp_to_png(FileHandler.DOWNLOAD_PATH + full_path, FileHandler.DOWNLOAD_PATH + group_path + '/' + file_name)
+        if (os.path.splitext(url)[1] == '.webp'):
+            FileHandler.convert_webp_to_png(FileHandler.DOWNLOAD_PATH + full_path,
+                                            FileHandler.DOWNLOAD_PATH + group_path + '/' + file_name)
             full_path = full_path.replace('.webp', '.png')
         return full_path
 
@@ -54,21 +54,22 @@ class FileHandler:
         im = Image.open(filename)
         im.save(destination + '.png', 'PNG')
 
+
 class CronDelete(threading.Thread):
 
     def __init__(self):
         threading.Thread.__init__(self)
 
     def run(self):
-        #this method works fine. we dont need to be super precise for data retention
+        # this method works fine. we dont need to be super precise for data retention
         while True:
             self.clean_web_directory()
             time.sleep(60 * 5)
 
-
     def clean_web_directory(self):
         current_time = time.time()
-        subdirs =  [join(config.webserver_directory, f) for f in listdir(config.webserver_directory) if isdir(join(config.webserver_directory, f))]
+        subdirs = [join(config.webserver_directory, f) for f in listdir(config.webserver_directory) if
+                   isdir(join(config.webserver_directory, f))]
         for directory in subdirs:
             onlyfiles = [join(directory, f) for f in listdir(directory) if isfile(join(directory, f))]
             for single_file in onlyfiles:

@@ -17,9 +17,10 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 import sqlite3
-from irc_server import IRCServer
 import logging
-from bridge import Bridge
+from vectronbot.irc_server import IRCServer
+from vectronbot.bridge import Bridge
+
 
 class DatabaseConnection:
     def __init__(self):
@@ -28,7 +29,7 @@ class DatabaseConnection:
         self._cursor = self._connection.cursor()
 
     def create_tables(self):
-        #create tables if they do not exist
+        # create tables if they do not exist
         self._cursor.execute('''
             CREATE TABLE IF NOT EXISTS irc_server (
             	description VARCHAR NOT NULL,
@@ -87,26 +88,29 @@ class DatabaseConnection:
                     VALUES
                 (?, ?, ?, ?)
 
-            ''', (secondary_bridge.tg_group_id, secondary_bridge.token, secondary_bridge.validated, secondary_bridge.bridge.tg_group_id))
+            ''', (secondary_bridge.tg_group_id, secondary_bridge.token, secondary_bridge.validated,
+                  secondary_bridge.bridge.tg_group_id))
             self._connection.commit()
 
     def set_secondary_bridge_validation(self, secondary_bridge):
         try:
-            self._cursor.execute('UPDATE secondary_bridge SET validated=? WHERE tg_id=?', ((1 if secondary_bridge.validated else 0), secondary_bridge.tg_group_id, ))
+            self._cursor.execute('UPDATE secondary_bridge SET validated=? WHERE tg_id=?',
+                                 ((1 if secondary_bridge.validated else 0), secondary_bridge.tg_group_id,))
             self._connection.commit()
         except Exception as e:
             logging.debug(e)
 
     def get_all_secondary_bridges(self, bridge):
-        self._cursor.execute('SELECT * FROM secondary_bridge WHERE primary_tg_id = ?', (bridge.tg_group_id, ))
+        self._cursor.execute('SELECT * FROM secondary_bridge WHERE primary_tg_id = ?', (bridge.tg_group_id,))
         lines = self._cursor.fetchall()
         secondary_bridges = {}
         for line in lines:
-            secondary_bridges[line['tg_id']] = Bridge.SecondaryBridge(line['tg_id'], line['validated'], line['token'], bridge)
+            secondary_bridges[line['tg_id']] = Bridge.SecondaryBridge(line['tg_id'], line['validated'], line['token'],
+                                                                      bridge)
         return secondary_bridges
 
     def delete_all_secondary_bridges(self, tg_group_id):
-        self._cursor.execute('DELETE FROM secondary_bridge WHERE primary_tg_id = ?', (tg_group_id, ))
+        self._cursor.execute('DELETE FROM secondary_bridge WHERE primary_tg_id = ?', (tg_group_id,))
 
     def delete_secondary_bridge(self, secondary_bridge, commit=False):
         self._cursor.execute('DELETE FROM secondary_bridge WHERE tg_id = ? ', (secondary_bridge.tg_group_id,))
@@ -122,7 +126,8 @@ class DatabaseConnection:
                     VALUES
                 (?, ?, ?, ?, ?, ?)
 
-            ''', (irc_server.description, irc_server.host, irc_server.port, irc_server.ssl, irc_server.password, visible))
+            ''', (
+            irc_server.description, irc_server.host, irc_server.port, irc_server.ssl, irc_server.password, visible))
             self._connection.commit()
 
     def get_all_irc_server_descriptions(self, only_visible=True):
@@ -166,14 +171,16 @@ class DatabaseConnection:
                 self._connection.commit()
 
     def irc_channel_exists(self, irc_channel):
-        res = self._cursor.execute('SELECT channel FROM irc_channel WHERE channel=? and irc_server_description=?', (irc_channel.channel, irc_channel.irc_server.description))
+        res = self._cursor.execute('SELECT channel FROM irc_channel WHERE channel=? and irc_server_description=?',
+                                   (irc_channel.channel, irc_channel.irc_server.description))
         line = self._cursor.fetchone()
         if line:
             return True
         return False
 
     def delete_irc_channel(self, irc_channel):
-        self._cursor.execute('DELETE FROM irc_channel WHERE channel=? and irc_server_description=?', (irc_channel.channel, irc_channel.irc_server.description))
+        self._cursor.execute('DELETE FROM irc_channel WHERE channel=? and irc_server_description=?',
+                             (irc_channel.channel, irc_channel.irc_server.description))
 
     def add_bridge(self, bridge):
         self.add_irc_channel(bridge.irc_channel, False)
@@ -185,7 +192,8 @@ class DatabaseConnection:
                     VALUES
                 (?, ?, ?, ?, ?)
 
-            ''', (bridge.tg_group_id, bridge.token, bridge.validated, bridge.irc_channel.channel, bridge.irc_channel.irc_server.description))
+            ''', (bridge.tg_group_id, bridge.token, bridge.validated, bridge.irc_channel.channel,
+                  bridge.irc_channel.irc_server.description))
             self._connection.commit()
 
     def bridge_exists(self, bridge):
@@ -197,32 +205,35 @@ class DatabaseConnection:
 
     def delete_bridge(self, bridge):
         self.delete_all_secondary_bridges(bridge.tg_group_id)
-        self._cursor.execute('DELETE FROM bridge WHERE tg_id=?', (bridge.tg_group_id, ))
+        self._cursor.execute('DELETE FROM bridge WHERE tg_id=?', (bridge.tg_group_id,))
         self.delete_irc_channel(bridge.irc_channel)
         self._connection.commit()
 
     def set_bridge_validation(self, bridge):
         try:
-            self._cursor.execute('UPDATE bridge SET validated=? WHERE tg_id=?', ((1 if bridge.validated else 0), bridge.tg_group_id, ))
+            self._cursor.execute('UPDATE bridge SET validated=? WHERE tg_id=?',
+                                 ((1 if bridge.validated else 0), bridge.tg_group_id,))
             self._connection.commit()
         except Exception as e:
             logging.debug(e)
 
     def get_all_bridges(self):
-        #tg_group_id, irc_server_description, channel, token, validated=False, save_to_db=False
+        # tg_group_id, irc_server_description, channel, token, validated=False, save_to_db=False
         res = self._cursor.execute('SELECT tg_id, irc_server_description, irc_channel, token, validated FROM bridge')
         bridges = self._cursor.fetchall()
         return bridges
 
     def irc_channel_alredy_bridged(self, channel, irc_server_description):
-        self._cursor.execute('SELECT * FROM bridge WHERE irc_server_description = ? AND irc_channel = ?', (irc_server_description, channel))
+        self._cursor.execute('SELECT * FROM bridge WHERE irc_server_description = ? AND irc_channel = ?',
+                             (irc_server_description, channel))
         line = self._cursor.fetchone()
         if line is None:
             return False
         return True
 
     def get_primary_group_id_by_irc_data(self, channel, irc_server_description):
-        self._cursor.execute('SELECT tg_id FROM bridge WHERE irc_server_description = ? AND irc_channel = ?', (irc_server_description, channel))
+        self._cursor.execute('SELECT tg_id FROM bridge WHERE irc_server_description = ? AND irc_channel = ?',
+                             (irc_server_description, channel))
         line = self._cursor.fetchone()
         if line is None:
             return 0

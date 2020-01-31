@@ -17,7 +17,6 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 class IRCServer():
-
     class IRCChannel():
         def __init__(self, irc_server, channel, channel_password=None):
             self.channel = channel
