@@ -27,20 +27,19 @@ from telegram import ChatMember, KeyboardButton, ReplyKeyboardMarkup
 from vectronbot.database import DatabaseConnection
 from vectronbot.bridge import Bridge
 from vectronbot.filehandler import FileHandler
-from vectronbot.config import config
 
 
 class TGBot():
     CHOOSING_SERVER, CHOOSING_CHANNEL, CONNECT_CHANNEL, CREATE_SECONDARY_BRIDGE = range(4)
     DELETE_BRIDGE = range(1)
 
-    DL_URL = config.webserver_url
-
-    def __init__(self):
+    def __init__(self, vectronconfig):
+        self._vectronconfig = vectronconfig
         self.bridges = {}
         self.irc_connections = IRCConnections()
+        self.DL_URL = self._vectronconfig['webserver_url']
 
-        self.updater = Updater(token=config.tg_bot_token)
+        self.updater = Updater(token=self._vectronconfig['tg_bot_token'])
         self._tg_bot = self.updater.bot
         self.dispatcher = self.updater.dispatcher
         help_handler = ConversationHandler(
@@ -152,12 +151,12 @@ class TGBot():
         self._tg_bot.sendMessage(chat_id=tg_group_id, text=message)
 
     def start_webhook(self):
-        self.updater.start_webhook(listen=config.webhook_listen_ip,
-                                   port=config.webhook_port,
-                                   url_path=config.tg_bot_token,
-                                   key=config.webhook_ssl_key,
-                                   cert=config.webhook_ssl_cert,
-                                   webhook_url=config.webhook_url)
+        self.updater.start_webhook(listen=self._vectronconfig['webhook_listen_ip'],
+                                   port=self._vectronconfig['webhook_port'],
+                                   url_path=self._vectronconfig['tg_bot_token'],
+                                   key=self._vectronconfig['webhook_ssl_key'],
+                                   cert=self._vectronconfig['webhook_ssl_cert'],
+                                   webhook_url=self._vectronconfig['webhook_url'])
 
     def help(self, bot, update):
         update.message.reply_text(

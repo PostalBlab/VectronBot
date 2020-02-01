@@ -17,16 +17,32 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
+import sys
 import logging
+import argparse
 from vectronbot.tg_bot import TGBot
 from vectronbot.database import DatabaseConnection
 from vectronbot.filehandler import CronDelete
-from vectronbot.config import config
 from vectronbot.irc_server import IRCServer
+
+logging.basicConfig(level=logging.INFO, format='%(asctime)s %(name)s: %(message)s',
+                    handlers=[logging.StreamHandler(sys.stdout)])
+logger = logging.getLogger('vectronbot')
 
 
 def start_tg_bot():
-    tg_bot = TGBot()
+    parser = argparse.ArgumentParser(description='TG / IRC bridge bot')
+    parser.add_argument('--config', metavar='path', type=str, required=True, help='path to config file')
+    parser.add_argument('--debug', dest='debug', action='store_true', required=False, default=False,
+                        help='Activate debugging output')
+    cliargs = parser.parse_args()
+
+    if cliargs.debug:
+        logger.setLevel(logging.DEBUG)
+        logger.info('Loglevel set to DEBUG')
+
+    vectronconfig = vectronbot.config.load_from_file(cliargs.config)
+    tg_bot = TGBot(vectronconfig)
 
     dbc = DatabaseConnection()
     dbc.create_tables()
@@ -52,8 +68,8 @@ def start_tg_bot():
         )
 
     # delete old files if the data retention is > 0
-    if config.webserver_data_retention > 0:
-        cron_delete = CronDelete()
+    if vectronconfig['webserver_data_retention'] > 0:
+        cron_delete = CronDelete(vectronconfig)
         cron_delete.start()
 
     tg_bot.start_webhook()

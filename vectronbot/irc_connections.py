@@ -21,31 +21,27 @@ import irc3
 import threading
 import irc3.config
 from vectronbot.database import DatabaseConnection
-from vectronbot.config import config as vectron_config
 
 
 class IRCConnections:
     class IRCConnection(threading.Thread):
-        def __init__(self, irc_server):
+        def __init__(self, irc_server, vectronconfig):
             self.irc_server = irc_server
             self.irc_server.irc_connection_thread = self
             threading.Thread.__init__(self)
 
             self._bot = None
+            self.irc_bot_nickname = vectronconfig['irc_bot_nickname']
 
             config = dict(
-                nick=vectron_config.irc_bot_nickname,
+                nick=irc_bot_nickname,
                 host=irc_server.host,
                 port=irc_server.port,
                 ssl=irc_server.ssl,
-            async=False,
-                  ssl_verify = 'CERT_NONE',
-                               includes = [
-                'irc3.plugins.core',
-                'irc3.plugins.command',
-                'irc3.plugins.userlist',
-                'vectronbot_irc_plugin',
-            ])
+                conf_async=False,
+                ssl_verify='CERT_NONE',
+                includes=['irc3.plugins.core', 'irc3.plugins.command', 'irc3.plugins.userlist', 'vectronbot_irc_plugin']
+            )
 
             self._bot = irc3.IrcBot(**config)
             self._bot.set_t_callback(self.t_callback)

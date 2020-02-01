@@ -23,41 +23,40 @@ import os
 import random
 import string
 from PIL import Image
-from config import config
 from os import listdir
 from os.path import isfile, join, isdir
 
 
 class FileHandler:
-    DOWNLOAD_PATH = config.webserver_directory
 
-    def download(url, tg_group_id):
+    def download(self, url, tg_group_id, vectronconfig):
         group_path = hashlib.md5(str(tg_group_id).encode('UTF-8')).hexdigest()
-        if not os.path.exists(FileHandler.DOWNLOAD_PATH + group_path):
-            os.makedirs(FileHandler.DOWNLOAD_PATH + group_path)
+        outputdir = os.path.join(vectronconfig['webserver_directory'], group_path)
+        os.makedirs(outputdir, exist_ok=True)
 
         file_name = ''.join(random.SystemRandom().choice(string.ascii_uppercase + string.digits) for _ in range(15))
         file_extension = os.path.splitext(url)[1]
 
-        full_path = group_path + '/' + file_name + file_extension
+        full_path = os.path.join(group_path, file_name + file_extension)
 
-        urllib.request.urlretrieve(url, FileHandler.DOWNLOAD_PATH + full_path)
+        urllib.request.urlretrieve(url, os.path.join(vectronconfig['webserver_directory'], full_path))
 
         if (os.path.splitext(url)[1] == '.webp'):
-            FileHandler.convert_webp_to_png(FileHandler.DOWNLOAD_PATH + full_path,
-                                            FileHandler.DOWNLOAD_PATH + group_path + '/' + file_name)
+            FileHandler.convert_webp_to_png(os.path.join(vectronconfig['webserver_directory'], full_path),
+                                            os.path.join(vectronconfig['webserver_directory'], group_path, file_name))
             full_path = full_path.replace('.webp', '.png')
         return full_path
 
-    def convert_webp_to_png(filename, destination):
-        webpname, webpextension = os.path.splitext(filename)
+    def convert_webp_to_png(self, filename, destination):
         im = Image.open(filename)
         im.save(destination + '.png', 'PNG')
 
 
 class CronDelete(threading.Thread):
 
-    def __init__(self):
+    def __init__(self, vectronconfig):
+        self._webserver_directory = vectronconfig['webserver_directory']
+        self._webserver_data_retention = vectronconfig['webserver_data_retention']
         threading.Thread.__init__(self)
 
     def run(self):
@@ -68,16 +67,15 @@ class CronDelete(threading.Thread):
 
     def clean_web_directory(self):
         current_time = time.time()
-        subdirs = [join(config.webserver_directory, f) for f in listdir(config.webserver_directory) if
-                   isdir(join(config.webserver_directory, f))]
+        subdirs = [join(self._webserver_directory, f) for f in listdir(self._webserver_directory) if
+                   isdir(join(self._webserver_directory, f))]
         for directory in subdirs:
             onlyfiles = [join(directory, f) for f in listdir(directory) if isfile(join(directory, f))]
             for single_file in onlyfiles:
                 st = os.path.getmtime(single_file)
-                if (st + (60 * config.webserver_data_retention)) < current_time:
+                if (st + (60 * self._webserver_data_retention)) < current_time:
                     logging.debug('Deleting file %s' % single_file)
                     try:
                         os.unlink(single_file)
-                    except Exception as e:
-                        logging.debug('Could not delete %s' % single_file)
-                        logging.debug(str(e))
+                    except Exception:
+                        logging.exception('Could not delete %s' % single_file)

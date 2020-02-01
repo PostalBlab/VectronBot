@@ -17,33 +17,27 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 import configparser
-import os.path
-import logging
 
 
-class Config:
+def load_from_file(configfile_path):
+    ini_config = configparser.ConfigParser()
+    ini_config.read(configfile_path)
+    vectronconfig = dict()
 
-    def __init__(self):
-        ini_config = configparser.ConfigParser()
-        if not os.path.isfile('config.ini'):
-            logging.debug('config.ini not found')
-            raise IOError
-        ini_config.read('config.ini')
+    vectronconfig['tg_bot_token'] = ini_config['tg_bot']['token']
 
-        self.tg_bot_token = ini_config['tg_bot']['token']
+    vectronconfig['webserver_url'] = ini_config['webserver']['url']
+    vectronconfig['webserver_directory'] = ini_config['webserver']['directory']
+    vectronconfig['webserver_data_retention'] = int(ini_config['webserver']['data_retention'])
 
-        self.webserver_url = ini_config['webserver']['url']
-        self.webserver_directory = ini_config['webserver']['directory']
-        self.webserver_data_retention = int(ini_config['webserver']['data_retention'])
+    vectronconfig['webhook_port'] = int(ini_config['webhook']['port'])
+    vectronconfig['webhook_url'] = ini_config['webhook']['url'] + ':{0}/{1}'.format(vectronconfig['webhook_port'],
+                                                                                    vectronconfig['tg_bot_token'])
+    vectronconfig['webhook_ssl_cert'] = ini_config['webhook']['ssl_cert']
+    vectronconfig['webhook_ssl_key'] = ini_config['webhook']['ssl_key']
+    vectronconfig['webhook_listen_ip'] = ini_config['webhook']['listen_ip']
 
-        self.webhook_port = int(ini_config['webhook']['port'])
-        self.webhook_url = ini_config['webhook']['url'] + ':{0}/{1}'.format(self.webhook_port, self.tg_bot_token)
-        self.webhook_ssl_cert = ini_config['webhook']['ssl_cert']
-        self.webhook_ssl_key = ini_config['webhook']['ssl_key']
-        self.webhook_listen_ip = ini_config['webhook']['listen_ip']
+    vectronconfig['nickserv_password'] = ini_config['irc']['nickserv_password']
+    vectronconfig['irc_bot_nickname'] = ini_config['irc']['nickname']
 
-        self.nickserv_password = ini_config['irc']['nickserv_password']
-        self.irc_bot_nickname = ini_config['irc']['nickname']
-
-
-config = Config()
+    return vectronconfig
