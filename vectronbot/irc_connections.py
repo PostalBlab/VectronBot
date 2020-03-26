@@ -20,12 +20,12 @@ import logging
 import irc3
 import threading
 import irc3.config
-from vectronbot.database import DatabaseConnection
-
+from database import DatabaseConnection
 
 class IRCConnections:
     class IRCConnection(threading.Thread):
         def __init__(self, irc_server, vectronconfig):
+            self._vectronconfig = vectronconfig
             self.irc_server = irc_server
             self.irc_server.irc_connection_thread = self
             threading.Thread.__init__(self)
@@ -34,7 +34,7 @@ class IRCConnections:
             self.irc_bot_nickname = vectronconfig['irc_bot_nickname']
 
             config = dict(
-                nick=irc_bot_nickname,
+                nick=self.irc_bot_nickname,
                 host=irc_server.host,
                 port=irc_server.port,
                 ssl=irc_server.ssl,
@@ -97,7 +97,8 @@ class IRCConnections:
             for key, channel in self.irc_server.channels.items():
                 self._bot.join_channel_threadsafe(channel.channel)
 
-    def __init__(self):
+    def __init__(self, vectronconfig):
+        self._vectronconfig = vectronconfig
         self.connections = {}
 
     def get_irc_connection(self, description):
@@ -111,7 +112,7 @@ class IRCConnections:
         dbc = DatabaseConnection()
         irc_server = dbc.get_irc_server_by_descripton(description)
 
-        irc_connection = IRCConnections.IRCConnection(irc_server)
+        irc_connection = IRCConnections.IRCConnection(irc_server, self._vectronconfig)
         self.connections[irc_server.description] = irc_connection
         irc_connection.start()
 

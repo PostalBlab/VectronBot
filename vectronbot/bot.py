@@ -20,10 +20,11 @@
 import sys
 import logging
 import argparse
-from vectronbot.tg_bot import TGBot
-from vectronbot.database import DatabaseConnection
-from vectronbot.filehandler import CronDelete
-from vectronbot.irc_server import IRCServer
+from tg_bot import TGBot
+from database import DatabaseConnection
+from filehandler import CronDelete
+from irc_server import IRCServer
+from config import load_from_file
 
 logging.basicConfig(level=logging.INFO, format='%(asctime)s %(name)s: %(message)s',
                     handlers=[logging.StreamHandler(sys.stdout)])
@@ -41,7 +42,7 @@ def start_tg_bot():
         logger.setLevel(logging.DEBUG)
         logger.info('Loglevel set to DEBUG')
 
-    vectronconfig = vectronbot.config.load_from_file(cliargs.config)
+    vectronconfig = load_from_file(cliargs.config)
     tg_bot = TGBot(vectronconfig)
 
     dbc = DatabaseConnection()

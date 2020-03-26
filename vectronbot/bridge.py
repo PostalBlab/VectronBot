@@ -15,7 +15,7 @@
 #
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
-
+from database import DatabaseConnection
 
 class Bridge():
     class SecondaryBridge():
@@ -34,7 +34,7 @@ class Bridge():
         self.tg_bot = tg_bot
         self.token = token
         self.secondary_bridges = {}
-        dbc = database.DatabaseConnection()
+        dbc = DatabaseConnection()
         dbc.get_all_secondary_bridges(self)
 
     def add_secondary_bridge(self, secondary_bridge):
@@ -58,7 +58,7 @@ class Bridge():
             for key, secondary_bridge in self.secondary_bridges.items():
                 if not secondary_bridge.validated and secondary_bridge.token == token:
                     secondary_bridge.validated = True
-                    dbc = database.DatabaseConnection()
+                    dbc = DatabaseConnection()
                     dbc.set_secondary_bridge_validation(secondary_bridge)
                     self.send_to_irc('system', 'Secondary bridge is now validated!')
                     return
@@ -78,7 +78,7 @@ class Bridge():
 
     def set_validation(self):
         self.validated = True
-        dbc = database.DatabaseConnection()
+        dbc = DatabaseConnection()
         dbc.set_bridge_validation(self)
 
     def tg_message(self, from_user, message):

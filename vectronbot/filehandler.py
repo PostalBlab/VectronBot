@@ -29,9 +29,9 @@ from os.path import isfile, join, isdir
 
 class FileHandler:
 
-    def download(self, url, tg_group_id, vectronconfig):
+    def download(url, tg_group_id, destination):
         group_path = hashlib.md5(str(tg_group_id).encode('UTF-8')).hexdigest()
-        outputdir = os.path.join(vectronconfig['webserver_directory'], group_path)
+        outputdir = os.path.join(destination, group_path)
         os.makedirs(outputdir, exist_ok=True)
 
         file_name = ''.join(random.SystemRandom().choice(string.ascii_uppercase + string.digits) for _ in range(15))
@@ -39,15 +39,15 @@ class FileHandler:
 
         full_path = os.path.join(group_path, file_name + file_extension)
 
-        urllib.request.urlretrieve(url, os.path.join(vectronconfig['webserver_directory'], full_path))
+        urllib.request.urlretrieve(url, os.path.join(destination, full_path))
 
         if (os.path.splitext(url)[1] == '.webp'):
-            FileHandler.convert_webp_to_png(os.path.join(vectronconfig['webserver_directory'], full_path),
-                                            os.path.join(vectronconfig['webserver_directory'], group_path, file_name))
+            FileHandler.convert_webp_to_png(os.path.join(destination, full_path),
+                                            os.path.join(destination, group_path, file_name))
             full_path = full_path.replace('.webp', '.png')
         return full_path
 
-    def convert_webp_to_png(self, filename, destination):
+    def convert_webp_to_png(filename, destination):
         im = Image.open(filename)
         im.save(destination + '.png', 'PNG')
 

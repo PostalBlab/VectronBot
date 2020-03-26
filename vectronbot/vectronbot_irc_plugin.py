@@ -30,13 +30,13 @@ class VectronBotIRCPlugin:
         'irc3.plugins.command'
     ]
 
-    def __init__(self, bot, nickserv_pw):
+    def __init__(self, bot):
         self.connected = threading.Event()
         self.token_callback = None
         self.message_callback = None
         self.bot = bot
         self.log = self.bot.log
-        self.nickserv_pw = nickserv_pw
+        #self.nickserv_pw = nickserv_pw
 
     @command
     def t(self, mask, target, args):
@@ -96,7 +96,7 @@ class VectronBotIRCPlugin:
         time.sleep(5)
         self.bot.irc_connection.rejoin_all_channel()
 
-    @irc3.event(r'(@(?P<tags>\S+) )?:(?P<ns>NickServ)!NickServ@services.'
-                r' NOTICE (?P<nick>\S+) :This nickname is registered.*')
-    def register(self, ns=None, nick=None, **kw):
-        self.bot.loop.call_soon_threadsafe(self.bot.privmsg, ns, 'identify %s %s' % (nick, self.nickserv_pw), True)
+   # @irc3.event(r'(@(?P<tags>\S+) )?:(?P<ns>NickServ)!NickServ@services.'
+   #             r' NOTICE (?P<nick>\S+) :This nickname is registered.*')
+   # def register(self, ns=None, nick=None, **kw):
+   #     self.bot.loop.call_soon_threadsafe(self.bot.privmsg, ns, 'identify %s %s' % (nick, self.nickserv_pw), True)

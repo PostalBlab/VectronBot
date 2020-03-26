@@ -18,9 +18,7 @@
 
 import sqlite3
 import logging
-from vectronbot.irc_server import IRCServer
-from vectronbot.bridge import Bridge
-
+from irc_server import IRCServer
 
 class DatabaseConnection:
     def __init__(self):
@@ -105,7 +103,7 @@ class DatabaseConnection:
         lines = self._cursor.fetchall()
         secondary_bridges = {}
         for line in lines:
-            secondary_bridges[line['tg_id']] = Bridge.SecondaryBridge(line['tg_id'], line['validated'], line['token'],
+            secondary_bridges[line['tg_id']] = bridge.Bridge.SecondaryBridge(line['tg_id'], line['validated'], line['token'],
                                                                       bridge)
         return secondary_bridges
 

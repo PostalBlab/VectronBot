@@ -20,14 +20,14 @@ import string
 import random
 import logging
 from telegram.ext import Updater
-from vectronbot.irc_connections import IRCConnections
+from irc_connections import IRCConnections
 from telegram.ext import CommandHandler
 from telegram.ext import MessageHandler, Filters, ConversationHandler, RegexHandler
 from telegram import ChatMember, KeyboardButton, ReplyKeyboardMarkup
-from vectronbot.database import DatabaseConnection
-from vectronbot.bridge import Bridge
-from vectronbot.filehandler import FileHandler
-
+from bridge import Bridge
+from database import DatabaseConnection
+from filehandler import FileHandler
+logger = logging.getLogger('vectronbot')
 
 class TGBot():
     CHOOSING_SERVER, CHOOSING_CHANNEL, CONNECT_CHANNEL, CREATE_SECONDARY_BRIDGE = range(4)
@@ -36,10 +36,10 @@ class TGBot():
     def __init__(self, vectronconfig):
         self._vectronconfig = vectronconfig
         self.bridges = {}
-        self.irc_connections = IRCConnections()
+        self.irc_connections = IRCConnections(self._vectronconfig)
         self.DL_URL = self._vectronconfig['webserver_url']
 
-        self.updater = Updater(token=self._vectronconfig['tg_bot_token'])
+        self.updater = Updater(token=self._vectronconfig['tg_bot_token'], use_context=True)
         self._tg_bot = self.updater.bot
         self.dispatcher = self.updater.dispatcher
         help_handler = ConversationHandler(
@@ -191,7 +191,7 @@ class TGBot():
     def choosing_server(self, bot, update, user_data):
         user_data['tg_group_id'] = update.message.chat.id
         servers = DatabaseConnection().get_all_irc_server_descriptions(False)
-        logging.debug(servers)
+        logger.debug(servers)
         if update.message.text in servers:
             user_data['irc_server_description'] = update.message.text
             update.message.reply_text(
@@ -334,7 +334,7 @@ class TGBot():
 
     def download_file(self, file_id, group_id):
         path = self._tg_bot.get_file(file_id)
-        file_location = FileHandler.download(path.file_path, group_id)
+        file_location = FileHandler.download(path.file_path, group_id, self._vectronconfig['webserver_directory'])
         return file_location
 
     def bridge_exists(self, tg_id):
@@ -354,7 +354,7 @@ class TGBot():
             last_name=' {last_name}'.format(last_name=last_name) if last_name is not None else ''
         )
 
-    def message_received(self, bot, update):
+    def message_received(self, update, context):
         try:
             bridge = self.get_bridge_by_id(update.message.chat_id)
             bridge.tg_message(
@@ -365,12 +365,12 @@ class TGBot():
                 update.message.text
             )
         except KeyError as e:
-            logging.debug('KeyError in tg_bot. Unknown group')
+            logger.debug('KeyError in tg_bot. Unknown group')
         except Exception as e:
-            logging.debug('Whaaat')
-            logging.debug(e)
+            logger.debug('Whaaat')
+            logger.debug(str(e))
 
-    def photo_received(self, bot, update):
+    def photo_received(self, update, context):
         try:
             bridge = self.get_bridge_by_id(update.message.chat_id)
             biggest = update.message.photo[0]
@@ -390,9 +390,9 @@ class TGBot():
             )
 
         except Exception as e:
-            logging.debug('photo_received: ' + str(e))
+            logger.debug('photo_received: ' + str(e))
 
-    def voice_received(self, bot, update):
+    def voice_received(self, update, context):
         try:
             bridge = self.get_bridge_by_id(update.message.chat_id)
             file_location = self.download_file(update.message.voice.file_id, update.message.chat_id)
@@ -407,9 +407,9 @@ class TGBot():
             )
 
         except Exception as e:
-            logging.debug('voice_received: ' + e)
+            logger.debug('voice_received: ' + str(e))
 
-    def document_received(self, bot, update):
+    def document_received(self, update, context):
         try:
             bridge = self.get_bridge_by_id(update.message.chat_id)
             file_location = self.download_file(update.message.document.file_id, update.message.chat_id)
@@ -423,9 +423,9 @@ class TGBot():
             )
 
         except Exception as e:
-            logging.debug('document_received: ' + e)
+            logger.debug('document_received: ' + str(e))
 
-    def sticker_received(self, bot, update):
+    def sticker_received(self, update, context):
         try:
             bridge = self.get_bridge_by_id(update.message.chat_id)
             file_location = self.download_file(update.message.sticker.file_id, update.message.chat_id)
@@ -435,9 +435,9 @@ class TGBot():
             ), self.DL_URL + file_location)
 
         except Exception as e:
-            logging.debug('sticker_received: ' + e)
+            logger.debug('sticker_received: ' + str(e))
 
-    def video_received(self, bot, update):
+    def video_received(self, update, context):
         try:
             bridge = self.get_bridge_by_id(update.message.chat_id)
             file_location = self.download_file(update.message.video.file_id, update.message.chat_id)
@@ -450,9 +450,9 @@ class TGBot():
             )
 
         except Exception as e:
-            logging.debug('video_received: ' + e)
+            logger.debug('video_received: ' + e)
 
-    def audio_received(self, bot, update):
+    def audio_received(self, update, context):
         try:
             bridge = self.get_bridge_by_id(update.message.chat_id)
             file_location = self.download_file(update.message.audio.file_id, update.message.chat_id)
@@ -462,4 +462,4 @@ class TGBot():
             ), self.DL_URL + file_location)
 
         except Exception as e:
-            logging.debug('audio_received: ' + e)
+            logger.debug('audio_received: ' + str(e))
