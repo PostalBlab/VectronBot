@@ -1,6 +1,9 @@
 This bot creates a bridge between a Telegram group and an IRC channel. Everything posted in the Telegram group will be send to the IRC. Photos, files etc. gets downloaded and a link is posted in the IRC (max 20MB, data gets deleted after several hours). Users in the irc have to put a leading "!t" to their messages to send them to the group.
 Sometimes you want to send a message or file to the irc, but you don't want to disturb the whole group. There is a solution! Create a group with the bot and do the normal registration. If there is already a primary bridge the bot asks you if you want to create a secondary bridge. The secondary bridge is one-way only. Everything you send to the Telegram group gets posted in the IRC but nothing gets from the IRC to the group, only to the primary group.
 
+# Security
+Make sure the webserver only delivers the files as `application/octet-stream` or something similar. Otherwise, the worst case scenario is that an attacker can execute code on the webserver by e.g. uploading php files that the webserver executes.
+
 # Dependencies
 
 * Pillow (PIL for python3)
