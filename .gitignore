@@ -12,6 +12,7 @@ local.properties
 .loadpath
 .recommenders
 
+
 # External tool builders
 .externalToolBuilders/
 
@@ -199,3 +200,11 @@ dmypy.json
 [Ss]cripts
 pyvenv.cfg
 pip-selfcheck.json
+
+*.db
+*.py[cod]
+*$py.class
+cert.pem
+private.key
+vectronbot.db
+config.ini
