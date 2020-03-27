@@ -103,7 +103,7 @@ class DatabaseConnection:
         lines = self._cursor.fetchall()
         secondary_bridges = {}
         for line in lines:
-            secondary_bridges[line['tg_id']] = bridge.Bridge.SecondaryBridge(line['tg_id'], line['validated'], line['token'],
+            secondary_bridges[line['tg_id']] = bridge.SecondaryBridge(line['tg_id'], line['validated'], line['token'],
                                                                       bridge)
         return secondary_bridges
 
