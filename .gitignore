@@ -208,3 +208,4 @@ cert.pem
 private.key
 vectronbot.db
 config.ini
+.idea/
